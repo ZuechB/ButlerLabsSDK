@@ -2,13 +2,13 @@
 using Newtonsoft.Json;
 using RestSharp;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 namespace ButlerLabsSDK
 {
     public interface IButlerlabs
     {
-        Task UploadDocument(string URL, string queueId);
+        Task<UploadedDocumentResponse?> UploadDocument(string URL, string queueId);
+        Task<ExtractionResultsResponse> GetExtractionResults(string uploadId, string queueId);
     }
 
     public class Butlerlabs : IButlerlabs
@@ -19,7 +19,7 @@ namespace ButlerLabsSDK
             this.APIKey = APIKey;
         }
 
-        public async Task UploadDocument(string URL, string queueId)
+        public async Task<UploadedDocumentResponse?> UploadDocument(string URL, string queueId)
         {
             byte[] binaryFile = null;
             using (HttpClient client = new HttpClient())
@@ -54,6 +54,8 @@ namespace ButlerLabsSDK
                     documentResponse = await response.Content.ReadFromJsonAsync<UploadedDocumentResponse>();
                 }
             }
+
+            return documentResponse;
         }
 
         public async Task<ExtractionResultsResponse> GetExtractionResults(string uploadId, string queueId)
